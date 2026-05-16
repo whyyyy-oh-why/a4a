@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getSchedule, saveSchedule, getImages, saveImages, getOrders, saveOrders, clearOrders, clearAuthed, ROLES, getOfficers, saveOfficers, getApplications, saveApplications, clearApplications } from '../store'
+import { getSchedule, saveSchedule, getImages, saveImages, getOrders, saveOrders, clearOrders, clearAuthed, ROLES, getOfficers, saveOfficers } from '../store'
 
 function PicDropZone({ pic, onPic }) {
   const [over, setOver] = useState(false)
@@ -35,7 +35,6 @@ const TABS = [
   { id: 'schedule', label: '📅 Schedule' },
   { id: 'team', label: '👥 Team Page' },
   { id: 'orders', label: '🛒 Pre-Orders' },
-  { id: 'applications', label: '📋 Applications' },
 ]
 
 export default function Moderator() {
@@ -57,9 +56,6 @@ export default function Moderator() {
   const [officerError, setOfficerError] = useState(false)
   const [officersSaved, setOfficersSaved] = useState(false)
 
-  // Applications
-  const [applications, setApplications] = useState([])
-
   // Orders
   const [orders, setOrders] = useState([])
 
@@ -68,7 +64,6 @@ export default function Moderator() {
     setImages(getImages())
     setOrders(getOrders())
     setOfficers(getOfficers())
-    setApplications(getApplications())
   }, [])
 
   const logout = () => { clearAuthed(); navigate('/login', { replace: true }) }
@@ -80,13 +75,6 @@ export default function Moderator() {
     setScheduleSaved(true)
     setTimeout(() => setScheduleSaved(false), 2000)
   }
-
-  const deleteApplication = (id) => {
-    const updated = applications.filter(a => a.id !== id)
-    saveApplications(updated)
-    setApplications(updated)
-  }
-  const clearAllApplications = () => { clearApplications(); setApplications([]) }
 
   // Orders
   const deleteOrder = (id) => {
@@ -285,53 +273,6 @@ export default function Moderator() {
               <button onClick={addOfficer}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-lg text-sm transition-colors">+ Add Officer</button>
             </div>
-          </section>
-        )}
-
-        {/* Applications Tab */}
-        {tab === 'applications' && (
-          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-gray-700">Applications</h2>
-                <p className="text-sm text-gray-400">{applications.length} application{applications.length !== 1 ? 's' : ''} submitted</p>
-              </div>
-              {applications.length > 0 && (
-                <button onClick={clearAllApplications}
-                  className="text-sm text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-4 py-1.5 rounded-lg transition-colors">Clear All</button>
-              )}
-            </div>
-            {applications.length === 0 ? (
-              <p className="text-gray-400 italic text-sm">No applications yet.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="pb-3 pr-4 text-gray-500 font-semibold">#</th>
-                      <th className="pb-3 pr-4 text-gray-500 font-semibold">Name</th>
-                      <th className="pb-3 pr-4 text-gray-500 font-semibold">Grade</th>
-                      <th className="pb-3 pr-4 text-gray-500 font-semibold">Submitted</th>
-                      <th className="pb-3 text-gray-500 font-semibold"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {applications.map((a, i) => (
-                      <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50">
-                        <td className="py-3 pr-4 text-gray-400">{i + 1}</td>
-                        <td className="py-3 pr-4 font-medium text-gray-800">{a.name}</td>
-                        <td className="py-3 pr-4 text-gray-600">{a.grade}</td>
-                        <td className="py-3 pr-4 text-gray-400 text-xs">{a.submittedAt}</td>
-                        <td className="py-3">
-                          <button onClick={() => deleteApplication(a.id)}
-                            className="text-red-400 hover:text-red-600 text-xs font-medium transition-colors">✕</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </section>
         )}
 
