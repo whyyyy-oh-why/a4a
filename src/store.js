@@ -37,5 +37,10 @@ export const getOrders = () => JSON.parse(localStorage.getItem(ORDERS_KEY)) ?? [
 export const saveOrders = (orders) => localStorage.setItem(ORDERS_KEY, JSON.stringify(orders))
 export const clearOrders = () => localStorage.removeItem(ORDERS_KEY)
 
+const SALE_APPS_KEY = 'sale_applications'
+export const getSaleApps = () => JSON.parse(localStorage.getItem(SALE_APPS_KEY)) ?? []
+export const saveSaleApps = (apps) => localStorage.setItem(SALE_APPS_KEY, JSON.stringify(apps))
+export const clearSaleApps = () => localStorage.removeItem(SALE_APPS_KEY)
+
 export const PASSCODE = 'admin1234'
 export { ROLES }

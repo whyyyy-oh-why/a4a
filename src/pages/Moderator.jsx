@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getSchedule, saveSchedule, getImages, saveImages, getOrders, saveOrders, clearOrders, clearAuthed, ROLES, getOfficers, saveOfficers } from '../store'
+import { getSchedule, saveSchedule, getImages, saveImages, getOrders, saveOrders, clearOrders, clearAuthed, ROLES, getOfficers, saveOfficers, getSaleApps, saveSaleApps, clearSaleApps } from '../store'
 
 function PicDropZone({ pic, onPic }) {
   const [over, setOver] = useState(false)
@@ -35,6 +35,7 @@ const TABS = [
   { id: 'schedule', label: '📅 Schedule' },
   { id: 'team', label: '👥 Team Page' },
   { id: 'orders', label: '🛒 Pre-Orders' },
+  { id: 'applications', label: '🙋 Sale Applications' },
 ]
 
 export default function Moderator() {
@@ -59,11 +60,15 @@ export default function Moderator() {
   // Orders
   const [orders, setOrders] = useState([])
 
+  // Sale Applications
+  const [saleApps, setSaleApps] = useState([])
+
   useEffect(() => {
     setSchedule(getSchedule())
     setImages(getImages())
     setOrders(getOrders())
     setOfficers(getOfficers())
+    setSaleApps(getSaleApps())
   }, [])
 
   const logout = () => { clearAuthed(); navigate('/login', { replace: true }) }
@@ -83,6 +88,14 @@ export default function Moderator() {
     setOrders(updated)
   }
   const clearAllOrders = () => { clearOrders(); setOrders([]) }
+
+  // Sale Applications
+  const deleteApp = (id) => {
+    const updated = saleApps.filter(a => a.id !== id)
+    saveSaleApps(updated)
+    setSaleApps(updated)
+  }
+  const clearAllApps = () => { clearSaleApps(); setSaleApps([]) }
 
   // Officers
   const addOfficer = () => {
@@ -316,6 +329,57 @@ export default function Moderator() {
                         <td className="py-3 pr-4 text-gray-400 text-xs">{o.submittedAt}</td>
                         <td className="py-3">
                           <button onClick={() => deleteOrder(o.id)}
+                            className="text-red-400 hover:text-red-600 text-xs font-medium transition-colors">✕</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Sale Applications Tab */}
+        {tab === 'applications' && (
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-gray-700">Sale Applications</h2>
+                <p className="text-sm text-gray-400">{saleApps.length} application{saleApps.length !== 1 ? 's' : ''} submitted</p>
+              </div>
+              {saleApps.length > 0 && (
+                <button onClick={clearAllApps}
+                  className="text-sm text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-4 py-1.5 rounded-lg transition-colors">
+                  Clear All
+                </button>
+              )}
+            </div>
+            {saleApps.length === 0 ? (
+              <p className="text-gray-400 italic text-sm">No applications yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="pb-3 pr-4 text-gray-500 font-semibold">#</th>
+                      <th className="pb-3 pr-4 text-gray-500 font-semibold">Name</th>
+                      <th className="pb-3 pr-4 text-gray-500 font-semibold">Grade</th>
+                      <th className="pb-3 pr-4 text-gray-500 font-semibold">7th Period Teacher</th>
+                      <th className="pb-3 pr-4 text-gray-500 font-semibold">Submitted</th>
+                      <th className="pb-3 text-gray-500 font-semibold"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {saleApps.map((a, i) => (
+                      <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="py-3 pr-4 text-gray-400">{i + 1}</td>
+                        <td className="py-3 pr-4 font-medium text-gray-800">{a.name}</td>
+                        <td className="py-3 pr-4 text-gray-600">{a.grade}</td>
+                        <td className="py-3 pr-4 text-gray-600">{a.teacher}</td>
+                        <td className="py-3 pr-4 text-gray-400 text-xs">{a.submittedAt}</td>
+                        <td className="py-3">
+                          <button onClick={() => deleteApp(a.id)}
                             className="text-red-400 hover:text-red-600 text-xs font-medium transition-colors">✕</button>
                         </td>
                       </tr>

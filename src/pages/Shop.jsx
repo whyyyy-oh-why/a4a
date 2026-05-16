@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { getOrders, saveOrders } from '../store'
+import { getOrders, saveOrders, getSaleApps, saveSaleApps } from '../store'
 
 const ITEMS = [
   { emoji: '🍦', name: 'Ice Cream', desc: 'Classic soft serve', price: '$2.00' },
@@ -10,6 +10,15 @@ const ITEMS = [
 export default function Shop() {
   const [form, setForm] = useState({ name: '', grade: '', items: [] })
   const [submitted, setSubmitted] = useState(false)
+  const [appForm, setAppForm] = useState({ name: '', grade: '', teacher: '' })
+  const [appSubmitted, setAppSubmitted] = useState(false)
+
+  const handleAppSubmit = (e) => {
+    e.preventDefault()
+    if (!appForm.name || !appForm.grade || !appForm.teacher) return
+    saveSaleApps([...getSaleApps(), { id: Date.now(), ...appForm, submittedAt: new Date().toLocaleString() }])
+    setAppSubmitted(true)
+  }
 
   const toggleItem = (item) => {
     setForm(f => ({
@@ -104,6 +113,53 @@ export default function Shop() {
                   Submit Pre-Order →
                 </button>
                 <p className="text-xs text-gray-400 text-center">You'll pay at pickup on Friday!</p>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Apply to Join Next Sale */}
+      <div className="max-w-2xl mx-auto px-6 pb-16">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          {appSubmitted ? (
+            <div className="text-center py-8">
+              <div className="text-5xl mb-4">✅</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Application submitted!</h3>
+              <p className="text-gray-500 text-sm">We'll let you know if you're selected for the next sale.</p>
+              <button onClick={() => { setAppSubmitted(false); setAppForm({ name: '', grade: '', teacher: '' }) }}
+                className="mt-6 text-teal-600 text-sm underline">Submit another</button>
+            </div>
+          ) : (
+            <>
+              <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-1">Next Sale</p>
+              <h2 className="text-xl font-bold text-gray-800 mb-1">Apply to Join the Next Sale</h2>
+              <p className="text-sm text-gray-400 mb-6">Want to help out? Fill out the form below!</p>
+              <form onSubmit={handleAppSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold tracking-widest text-gray-500 uppercase block mb-1">Your Name</label>
+                  <input type="text" placeholder="Full name" value={appForm.name}
+                    onChange={e => setAppForm(f => ({ ...f, name: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold tracking-widest text-gray-500 uppercase block mb-1">Grade Level</label>
+                  <select value={appForm.grade} onChange={e => setAppForm(f => ({ ...f, grade: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    <option value="">Select grade</option>
+                    {['6th', '7th', '8th'].map(g => <option key={g}>{g}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold tracking-widest text-gray-500 uppercase block mb-1">7th Period Teacher</label>
+                  <input type="text" placeholder="Teacher's name" value={appForm.teacher}
+                    onChange={e => setAppForm(f => ({ ...f, teacher: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+                </div>
+                <button type="submit"
+                  className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-full transition-colors">
+                  Submit Application →
+                </button>
               </form>
             </>
           )}
