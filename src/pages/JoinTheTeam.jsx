@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { getApplications, saveApplications } from '../store'
 
 const rules = [
   { n: '1', text: <>Request release from 7th period at <strong>3:25 PM</strong>.</> },
@@ -8,6 +9,16 @@ const rules = [
 ]
 
 export default function JoinTheTeam() {
+  const [form, setForm] = useState({ name: '', grade: '' })
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!form.name || !form.grade) return
+    const app = { id: Date.now(), name: form.name, grade: form.grade, submittedAt: new Date().toLocaleString() }
+    saveApplications([...getApplications(), app])
+    setSubmitted(true)
+  }
   return (
     <main className="min-h-screen bg-[#fdf6f0]">
       <section className="bg-gradient-to-br from-teal-600 to-teal-800 text-white py-16 px-6 text-center">
@@ -52,16 +63,42 @@ export default function JoinTheTeam() {
         </div>
 
         {/* Apply */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
-          <div>
-            <div className="text-4xl mb-3">🤝</div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Apply to Join the Next Sale</h2>
-            <p className="text-sm text-gray-500 mb-4">Ready to make a difference and score free ice cream? Fill out our application form to join the team!</p>
-          </div>
-          <a href="https://forms.google.com" target="_blank" rel="noreferrer"
-            className="block w-full bg-teal-600 hover:bg-teal-700 text-white text-center font-semibold py-3 rounded-full transition-colors">
-            Apply Now →
-          </a>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          {submitted ? (
+            <div className="text-center py-8">
+              <div className="text-5xl mb-4">🎉</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Application submitted!</h3>
+              <p className="text-gray-500 text-sm">We'll reach out before the next sale. Thanks for signing up!</p>
+              <button onClick={() => { setSubmitted(false); setForm({ name: '', grade: '' }) }}
+                className="mt-6 text-teal-600 text-sm underline">Submit another</button>
+            </div>
+          ) : (
+            <>
+              <div className="text-4xl mb-3">🤝</div>
+              <h2 className="text-xl font-bold text-gray-800 mb-1">Apply for Next Sale</h2>
+              <p className="text-sm text-gray-400 mb-5">Fill out the form below and we'll add you to the next sale rotation!</p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold tracking-widest text-gray-500 uppercase block mb-1">Student Name</label>
+                  <input type="text" placeholder="Your full name" value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold tracking-widest text-gray-500 uppercase block mb-1">Grade</label>
+                  <select value={form.grade} onChange={e => setForm(f => ({ ...f, grade: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    <option value="">Select grade</option>
+                    {['6th', '7th', '8th'].map(g => <option key={g}>{g}</option>)}
+                  </select>
+                </div>
+                <button type="submit"
+                  className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-full transition-colors">
+                  Submit Application →
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </main>
